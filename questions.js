@@ -86,7 +86,7 @@ const QUESTIONS = [
 const PRIZE_POOLS = [
   // Q5 — pick one
   [
-    "Flowers and a card",
+    "Glass of wine at Cork",
     "Coffee in bed with scratchoffs and Rom walked",
     "Gluten free bakery crawl",
     "Fishmarket Gift Card",
