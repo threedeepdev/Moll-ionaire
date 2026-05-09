@@ -106,5 +106,4 @@ const FAMILY_MEMBERS = [
   "Cole",
   "Jenn",
   "Amy",
-  "Marion",
 ];
