@@ -316,50 +316,7 @@
   function useRios() {
     if (!state.lifelines.rios || state.answered) return;
     disableLifeline("rios");
-
-    const q = QUESTIONS[state.questionIndex];
-    const difficulty = state.questionIndex / QUESTIONS.length;
-    const correctBase = 65 - difficulty * 30;
-    const correctPct = Math.max(30, correctBase + (Math.random() * 14 - 7));
-
-    const percentages = [0, 0, 0, 0];
-    percentages[q.correct] = correctPct;
-    let remaining = 100 - correctPct;
-    const others = [0, 1, 2, 3].filter((i) => i !== q.correct);
-    others.forEach((i, idx) => {
-      const isLast = idx === others.length - 1;
-      let val;
-      if (state.hiddenByFifty.includes(i)) {
-        val = 0;
-      } else if (isLast) {
-        val = remaining;
-      } else {
-        val = Math.random() * remaining * 0.7;
-        remaining -= val;
-      }
-      percentages[i] = val;
-    });
-    const total = percentages.reduce((a, b) => a + b, 0);
-    const scaled = percentages.map((p) => (p / total) * 100);
-
-    riosPollEl.innerHTML = "";
-    riosPollEl.classList.remove("hidden");
-    LETTERS.forEach((letter, i) => {
-      const bar = document.createElement("div");
-      bar.className = "poll-bar";
-      const fill = document.createElement("div");
-      fill.className = "poll-fill";
-      fill.style.height = "0%";
-      const label = document.createElement("div");
-      label.className = "poll-label";
-      label.textContent = `${letter}: ${Math.round(scaled[i])}%`;
-      bar.appendChild(fill);
-      bar.appendChild(label);
-      riosPollEl.appendChild(bar);
-      requestAnimationFrame(() => { fill.style.height = `${scaled[i]}%`; });
-    });
-
-    showLifelineMessage(`<strong>The Rios voted:</strong>`);
+    showLifelineMessage(`<strong>👨‍👩‍👧 Ask the Rios</strong> — lifeline used. Ask them in person!`);
   }
 
   function useFamily() {
