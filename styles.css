@@ -36,18 +36,20 @@ html, body {
 
 .hidden { display: none !important; }
 
-/* Start screen */
-.logo h1 {
-  font-size: clamp(2rem, 6vw, 4rem);
-  margin: 0;
-  letter-spacing: 2px;
-  text-shadow: 0 0 20px rgba(255, 210, 77, 0.3);
+/* Start screen — Millionaire logo */
+.wwtbam-logo {
+  width: clamp(240px, 65vw, 340px);
+  height: auto;
+  display: block;
+  margin: 0 auto 20px;
+  animation: logo-pulse 3.5s ease-in-out infinite;
 }
-.logo-accent {
-  color: var(--gold);
-  text-shadow: 0 0 30px rgba(255, 210, 77, 0.6), 0 0 60px rgba(255, 210, 77, 0.3);
+
+@keyframes logo-pulse {
+  0%, 100% { filter: drop-shadow(0 0 18px rgba(130, 50, 220, 0.5)); }
+  50%       { filter: drop-shadow(0 0 38px rgba(130, 50, 220, 0.8))
+                       drop-shadow(0 0 60px rgba(255, 210, 77, 0.25)); }
 }
-.tagline { color: var(--muted); font-size: 1.1rem; margin: 24px 0 16px; }
 
 .rules {
   list-style: none;
