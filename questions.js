@@ -82,12 +82,29 @@ const QUESTIONS = [
   },
 ];
 
-// Prizes are awarded cumulatively at questions 5, 10, and 15.
-// Edit these to whatever the real prizes are.
-const PRIZES = [
-  "Prize #1 — (edit me in questions.js)",
-  "Prize #2 — (edit me in questions.js)",
-  "Prize #3 — (edit me in questions.js)",
+// Prize pools — player picks ONE from each pool at Q5, Q10, and Q15.
+const PRIZE_POOLS = [
+  // Q5 — pick one
+  [
+    "Flowers and a card",
+    "Coffee in bed with scratchoffs and Rom walked",
+    "Gluten free bakery crawl",
+    "Fishmarket Gift Card",
+  ],
+  // Q10 — pick one
+  [
+    "Brooklyn teacup vintage studio",
+    "Pearl & the Beast",
+    "Shopping & Lunch at Printemps",
+    "Movie and homecooked 3-course meal in bed",
+  ],
+  // Q15 — pick one
+  [
+    "Peking duck dinner",
+    "Mystery envelope",
+    "Day trip to Long Island Vanderbilt Mansion",
+    "Petite Rouge show",
+  ],
 ];
 
 // Milestones: passing each one (answering that question correctly) awards the next prize.
@@ -100,10 +117,10 @@ const MILESTONES = [
 // Family members the player can call with the "Call a family member" lifeline.
 // Edit this list freely.
 const FAMILY_MEMBERS = [
-  "Mom",
-  "Dad",
+  "Amy",
   "Aunt Jackie",
   "Cole",
+  "Dick",
   "Jenn",
-  "Amy",
+  "Justinos",
 ];

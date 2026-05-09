@@ -34,6 +34,8 @@
   const milestoneOverlay = document.getElementById("milestone-overlay");
   const milestoneTitleEl = document.getElementById("milestone-title");
   const milestoneTextEl = document.getElementById("milestone-text");
+  const prizeSelectionEl = document.getElementById("prize-selection");
+  const prizeChosenConfirm = document.getElementById("prize-chosen-confirm");
   const milestoneContinueBtn = document.getElementById("milestone-continue");
 
   const LETTERS = ["A", "B", "C", "D"];
@@ -63,10 +65,10 @@
 
   function buildPrizesList() {
     prizesList.innerHTML = "";
-    PRIZES.forEach((prize, idx) => {
+    PRIZE_POOLS.forEach((_, idx) => {
       const li = document.createElement("li");
       li.dataset.prizeIndex = idx;
-      li.textContent = `${idx + 1}. ${prize}`;
+      li.textContent = `${idx + 1}. Not yet earned`;
       prizesList.appendChild(li);
     });
   }
@@ -81,7 +83,9 @@
 
   function updatePrizesUI() {
     Array.from(prizesList.children).forEach((li, idx) => {
-      li.classList.toggle("earned", state.prizesWon > idx);
+      const chosen = state.chosenPrizes[idx];
+      li.classList.toggle("earned", !!chosen);
+      li.textContent = chosen ? `${idx + 1}. ${chosen}` : `${idx + 1}. Not yet earned`;
     });
   }
 
@@ -105,6 +109,8 @@
       locked: false,
       answered: false,
       prizesWon: 0,
+      chosenPrizes: [],
+      pendingPrize: null,
       lifelines: { justino: true, rios: true, family: true, romulus: true },
       hiddenByFifty: [],
     };
@@ -139,7 +145,7 @@
     lockControls.classList.add("hidden");
     riosPollEl.classList.add("hidden");
     lifelineMessageEl.classList.add("hidden");
-    walkAwayBtn.style.display = state.prizesWon > 0 ? "inline-block" : "none";
+    walkAwayBtn.style.display = state.chosenPrizes.length > 0 ? "inline-block" : "none";
     updateLadder();
     updatePrizesUI();
   }
@@ -202,18 +208,39 @@
 
   function showMilestone(milestone) {
     const isLast = state.questionIndex === QUESTIONS.length - 1;
-    const level = milestone.prizeIndex + 1; // 1, 2, or 3
+    const level = milestone.prizeIndex + 1;
+    const pool = PRIZE_POOLS[milestone.prizeIndex];
 
     const titles = [
-      "🎉 Prize #1 unlocked!",
-      "🎉🎉 Prize #2 unlocked!",
-      "🏆🦬 MOLL-IONAIRE!! 🦬🏆",
+      "🎉 You've earned a prize — choose your reward!",
+      "🎉🎉 Another prize — choose your reward!",
+      "🏆🦬 MOLL-IONAIRE!! Choose your grand prize! 🦬🏆",
     ];
     milestoneTitleEl.textContent = titles[milestone.prizeIndex];
-    milestoneTextEl.innerHTML = isLast
-      ? `You answered all 15! You've won <strong>${PRIZES[milestone.prizeIndex]}</strong> — and everything else!`
-      : `You've locked in <strong>${PRIZES[milestone.prizeIndex]}</strong>.<br>Keep going for more!`;
-    milestoneContinueBtn.textContent = isLast ? "🦬 Claim your prizes! 🦬" : "Keep going →";
+    milestoneTextEl.textContent = "";
+
+    // Reset prize selection UI
+    state.pendingPrize = null;
+    prizeChosenConfirm.classList.add("hidden");
+    milestoneContinueBtn.classList.add("hidden");
+    milestoneContinueBtn.textContent = isLast ? "🦬 Claim my prizes! 🦬" : "Keep going →";
+
+    prizeSelectionEl.innerHTML = "";
+    pool.forEach((prize) => {
+      const card = document.createElement("button");
+      card.className = "prize-card";
+      card.textContent = prize;
+      card.addEventListener("click", () => {
+        // Allow changing selection before confirming
+        Array.from(prizeSelectionEl.querySelectorAll(".prize-card")).forEach((c) => c.classList.remove("selected"));
+        card.classList.add("selected");
+        state.pendingPrize = prize;
+        prizeChosenConfirm.textContent = `✓ You chose: "${prize}"`;
+        prizeChosenConfirm.classList.remove("hidden");
+        milestoneContinueBtn.classList.remove("hidden");
+      });
+      prizeSelectionEl.appendChild(card);
+    });
 
     milestoneOverlay.classList.remove("hidden");
 
@@ -229,12 +256,12 @@
       message = "All 15 questions answered correctly. Legendary.";
     } else if (result === "lost") {
       title = "Game over";
-      message = state.prizesWon > 0
+      message = state.chosenPrizes.length > 0
         ? "Wrong answer — but you keep the prizes you've already locked in."
         : "Wrong answer — and no prizes locked in yet. Tough break.";
     } else {
       title = "You walked away";
-      message = state.prizesWon > 0
+      message = state.chosenPrizes.length > 0
         ? "Smart move. You walk away with everything you've earned."
         : "You walked away before earning any prizes. Maybe next time!";
     }
@@ -242,17 +269,17 @@
     endMessage.textContent = message;
 
     endPrizesEl.innerHTML = "";
-    if (state.prizesWon === 0) {
+    if (state.chosenPrizes.length === 0) {
       const li = document.createElement("li");
       li.classList.add("empty");
       li.textContent = "No prizes earned this round.";
       endPrizesEl.appendChild(li);
     } else {
-      for (let i = 0; i < state.prizesWon; i++) {
+      state.chosenPrizes.forEach((prize) => {
         const li = document.createElement("li");
-        li.textContent = `🎁 ${PRIZES[i]}`;
+        li.textContent = `🎁 ${prize}`;
         endPrizesEl.appendChild(li);
-      }
+      });
     }
     showScreen(endScreen);
   }
@@ -412,9 +439,16 @@
   familyCancelBtn.addEventListener("click", () => familyModal.classList.add("hidden"));
 
   milestoneContinueBtn.addEventListener("click", () => {
+    if (!state.pendingPrize) return; // must select a prize first
+    state.chosenPrizes.push(state.pendingPrize);
+    state.prizesWon = state.chosenPrizes.length;
+    state.pendingPrize = null;
+    updatePrizesUI();
+
     milestoneOverlay.classList.add("hidden");
     const reels = milestoneOverlay.querySelector(".b-reels");
     if (reels) reels.remove();
+
     if (state.questionIndex === QUESTIONS.length - 1) {
       endGame("won");
     } else {
