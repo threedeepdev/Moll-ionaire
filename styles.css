@@ -52,8 +52,8 @@ html, body {
 }
 
 .wwtbam-logo--small {
-  width: clamp(120px, 22vw, 180px);
-  margin: 0 auto 16px;
+  width: clamp(200px, 35vw, 280px);
+  margin: 0 auto 20px;
   display: block;
 }
 
