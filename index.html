@@ -14,7 +14,12 @@
         <h1>Who Wants to Be a</h1>
         <h1 class="logo-accent">Moll-ionaire?</h1>
       </div>
-      <p class="tagline">15 questions stand between you and the top prize.</p>
+      <p class="tagline">15 questions. 3 prizes. 4 lifelines. One legendary night.</p>
+      <ul class="rules">
+        <li>Answer all 5 → win <strong>Prize #1</strong></li>
+        <li>Answer all 10 → win <strong>Prizes #1 + #2</strong></li>
+        <li>Answer all 15 → win <strong>all three prizes</strong></li>
+      </ul>
       <button id="start-btn" class="btn-primary">Start Game</button>
     </section>
 
@@ -23,9 +28,22 @@
       <div class="game-layout">
         <main class="game-main">
           <div class="lifelines" aria-label="Lifelines">
-            <button class="lifeline" data-lifeline="fifty" title="50:50">50:50</button>
-            <button class="lifeline" data-lifeline="audience" title="Ask the Audience">👥</button>
-            <button class="lifeline" data-lifeline="phone" title="Phone a Friend">📞</button>
+            <button class="lifeline" data-lifeline="justino" title="Have Justino make it a 50/50">
+              <span class="lifeline-emoji">✂️</span>
+              <span class="lifeline-name">Justino's 50/50</span>
+            </button>
+            <button class="lifeline" data-lifeline="rios" title="Ask the Rios">
+              <span class="lifeline-emoji">👨‍👩‍👧</span>
+              <span class="lifeline-name">Ask the Rios</span>
+            </button>
+            <button class="lifeline" data-lifeline="family" title="Call a family member">
+              <span class="lifeline-emoji">📞</span>
+              <span class="lifeline-name">Call Family</span>
+            </button>
+            <button class="lifeline" data-lifeline="romulus" title="Ask Romulus">
+              <span class="lifeline-emoji">🐶</span>
+              <span class="lifeline-name">Ask Romulus</span>
+            </button>
           </div>
 
           <div class="question-card">
@@ -37,27 +55,53 @@
               <button class="answer" data-index="2"><span class="letter">C</span><span class="answer-text"></span></button>
               <button class="answer" data-index="3"><span class="letter">D</span><span class="answer-text"></span></button>
             </div>
-            <div id="audience-poll" class="audience-poll hidden"></div>
-            <div id="phone-message" class="phone-message hidden"></div>
+            <div id="rios-poll" class="rios-poll hidden"></div>
+            <div id="lifeline-message" class="lifeline-message hidden"></div>
             <div id="lock-controls" class="lock-controls hidden">
               <button id="lock-btn" class="btn-primary">Lock it in</button>
               <button id="unlock-btn" class="btn-secondary">Choose again</button>
             </div>
-            <button id="walk-away-btn" class="btn-walkaway">Walk away</button>
+            <button id="walk-away-btn" class="btn-walkaway">Walk away with what I have</button>
           </div>
         </main>
 
-        <aside class="ladder" aria-label="Prize ladder">
+        <aside class="ladder" aria-label="Question ladder">
+          <h3 class="ladder-title">Progress</h3>
           <ol id="ladder-list"></ol>
+          <div class="prizes-status">
+            <h3 class="ladder-title">Prizes won</h3>
+            <ul id="prizes-list"></ul>
+          </div>
         </aside>
       </div>
     </section>
+
+    <!-- Family member modal -->
+    <div id="family-modal" class="modal hidden">
+      <div class="modal-content">
+        <h3>Who do you want to call?</h3>
+        <div id="family-list" class="family-list"></div>
+        <button id="family-cancel" class="btn-secondary">Never mind</button>
+      </div>
+    </div>
+
+    <!-- Milestone celebration overlay -->
+    <div id="milestone-overlay" class="modal hidden">
+      <div class="modal-content celebration">
+        <h2 id="milestone-title"></h2>
+        <p id="milestone-text"></p>
+        <button id="milestone-continue" class="btn-primary">Keep going</button>
+      </div>
+    </div>
 
     <!-- End screen -->
     <section id="end-screen" class="screen">
       <h2 id="end-title"></h2>
       <p id="end-message"></p>
-      <p class="winnings">You walk away with <span id="end-amount"></span></p>
+      <div class="winnings">
+        <h3>Prizes won:</h3>
+        <ul id="end-prizes"></ul>
+      </div>
       <button id="restart-btn" class="btn-primary">Play again</button>
     </section>
   </div>

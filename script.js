@@ -1,35 +1,44 @@
 (function () {
+  // Screens
   const startScreen = document.getElementById("start-screen");
   const gameScreen = document.getElementById("game-screen");
   const endScreen = document.getElementById("end-screen");
 
+  // Buttons
   const startBtn = document.getElementById("start-btn");
   const restartBtn = document.getElementById("restart-btn");
   const walkAwayBtn = document.getElementById("walk-away-btn");
-
-  const questionNumberEl = document.getElementById("question-number");
-  const questionTextEl = document.getElementById("question-text");
-  const answerButtons = Array.from(document.querySelectorAll(".answer"));
-  const ladderList = document.getElementById("ladder-list");
-
   const lockBtn = document.getElementById("lock-btn");
   const unlockBtn = document.getElementById("unlock-btn");
   const lockControls = document.getElementById("lock-controls");
 
-  const audiencePollEl = document.getElementById("audience-poll");
-  const phoneMessageEl = document.getElementById("phone-message");
-
+  // Game UI
+  const questionNumberEl = document.getElementById("question-number");
+  const questionTextEl = document.getElementById("question-text");
+  const answerButtons = Array.from(document.querySelectorAll(".answer"));
+  const ladderList = document.getElementById("ladder-list");
+  const prizesList = document.getElementById("prizes-list");
+  const riosPollEl = document.getElementById("rios-poll");
+  const lifelineMessageEl = document.getElementById("lifeline-message");
   const lifelineButtons = Array.from(document.querySelectorAll(".lifeline"));
 
+  // End screen
   const endTitle = document.getElementById("end-title");
   const endMessage = document.getElementById("end-message");
-  const endAmount = document.getElementById("end-amount");
+  const endPrizesEl = document.getElementById("end-prizes");
+
+  // Modals
+  const familyModal = document.getElementById("family-modal");
+  const familyListEl = document.getElementById("family-list");
+  const familyCancelBtn = document.getElementById("family-cancel");
+  const milestoneOverlay = document.getElementById("milestone-overlay");
+  const milestoneTitleEl = document.getElementById("milestone-title");
+  const milestoneTextEl = document.getElementById("milestone-text");
+  const milestoneContinueBtn = document.getElementById("milestone-continue");
+
+  const LETTERS = ["A", "B", "C", "D"];
 
   let state;
-
-  function formatMoney(n) {
-    return "$" + n.toLocaleString("en-US");
-  }
 
   function showScreen(screen) {
     [startScreen, gameScreen, endScreen].forEach((s) => s.classList.remove("active"));
@@ -38,12 +47,27 @@
 
   function buildLadder() {
     ladderList.innerHTML = "";
-    PRIZE_LADDER.forEach((amount, idx) => {
+    QUESTIONS.forEach((_, idx) => {
       const li = document.createElement("li");
       li.dataset.index = idx;
-      if (MILESTONES.includes(idx)) li.classList.add("milestone");
-      li.innerHTML = `<span>${idx + 1}</span><span>${formatMoney(amount)}</span>`;
+      const milestone = MILESTONES.find((m) => m.questionIndex === idx);
+      if (milestone) {
+        li.classList.add("milestone");
+        li.innerHTML = `<span>Q${idx + 1}</span><span class="prize-tag">🎁 Prize ${milestone.prizeIndex + 1}</span>`;
+      } else {
+        li.innerHTML = `<span>Q${idx + 1}</span>`;
+      }
       ladderList.appendChild(li);
+    });
+  }
+
+  function buildPrizesList() {
+    prizesList.innerHTML = "";
+    PRIZES.forEach((prize, idx) => {
+      const li = document.createElement("li");
+      li.dataset.prizeIndex = idx;
+      li.textContent = `${idx + 1}. ${prize}`;
+      prizesList.appendChild(li);
     });
   }
 
@@ -55,16 +79,38 @@
     });
   }
 
+  function updatePrizesUI() {
+    Array.from(prizesList.children).forEach((li, idx) => {
+      li.classList.toggle("earned", state.prizesWon > idx);
+    });
+  }
+
+  function buildFamilyList() {
+    familyListEl.innerHTML = "";
+    FAMILY_MEMBERS.forEach((name) => {
+      const btn = document.createElement("button");
+      btn.textContent = name;
+      btn.addEventListener("click", () => {
+        familyModal.classList.add("hidden");
+        deliverFamilyHint(name);
+      });
+      familyListEl.appendChild(btn);
+    });
+  }
+
   function startGame() {
     state = {
       questionIndex: 0,
       selected: null,
       locked: false,
       answered: false,
-      lifelines: { fifty: true, audience: true, phone: true },
+      prizesWon: 0,
+      lifelines: { justino: true, rios: true, family: true, romulus: true },
       hiddenByFifty: [],
     };
     buildLadder();
+    buildPrizesList();
+    buildFamilyList();
     lifelineButtons.forEach((btn) => (btn.disabled = false));
     showScreen(gameScreen);
     loadQuestion();
@@ -77,7 +123,11 @@
     state.answered = false;
     state.hiddenByFifty = [];
 
-    questionNumberEl.textContent = `Question ${state.questionIndex + 1} · for ${formatMoney(PRIZE_LADDER[state.questionIndex])}`;
+    const milestone = MILESTONES.find((m) => m.questionIndex === state.questionIndex);
+    const milestoneNote = milestone
+      ? ` · 🎁 Win Prize #${milestone.prizeIndex + 1}!`
+      : "";
+    questionNumberEl.textContent = `Question ${state.questionIndex + 1} of ${QUESTIONS.length}${milestoneNote}`;
     questionTextEl.textContent = q.question;
 
     answerButtons.forEach((btn, i) => {
@@ -87,14 +137,16 @@
     });
 
     lockControls.classList.add("hidden");
-    audiencePollEl.classList.add("hidden");
-    phoneMessageEl.classList.add("hidden");
-    walkAwayBtn.style.display = "inline-block";
+    riosPollEl.classList.add("hidden");
+    lifelineMessageEl.classList.add("hidden");
+    walkAwayBtn.style.display = state.questionIndex > 0 ? "inline-block" : "none";
     updateLadder();
+    updatePrizesUI();
   }
 
   function selectAnswer(idx) {
     if (state.answered || state.locked) return;
+    if (answerButtons[idx].disabled) return;
     state.selected = idx;
     answerButtons.forEach((b, i) => b.classList.toggle("selected", i === idx));
     lockControls.classList.remove("hidden");
@@ -115,12 +167,20 @@
       if (chosen === q.correct) {
         answerButtons[chosen].classList.remove("selected");
         answerButtons[chosen].classList.add("correct");
-        setTimeout(advance, 1500);
+
+        const milestone = MILESTONES.find((m) => m.questionIndex === state.questionIndex);
+        if (milestone) {
+          state.prizesWon = milestone.prizeIndex + 1;
+          updatePrizesUI();
+          setTimeout(() => showMilestone(milestone), 1200);
+        } else {
+          setTimeout(advance, 1500);
+        }
       } else {
         answerButtons[chosen].classList.remove("selected");
         answerButtons[chosen].classList.add("wrong");
         answerButtons[q.correct].classList.add("correct");
-        setTimeout(() => endGame(false), 2200);
+        setTimeout(() => endGame("lost"), 2400);
       }
     }, 800);
   }
@@ -134,54 +194,77 @@
   function advance() {
     state.questionIndex++;
     if (state.questionIndex >= QUESTIONS.length) {
-      endGame(true);
+      endGame("won");
     } else {
       loadQuestion();
     }
   }
 
-  function winningsForLoss() {
-    // Walk back to the highest milestone the player has passed.
-    let amount = 0;
-    for (const m of MILESTONES) {
-      if (state.questionIndex > m) amount = PRIZE_LADDER[m];
+  function showMilestone(milestone) {
+    if (state.questionIndex === QUESTIONS.length - 1) {
+      // Last milestone — go straight to end screen
+      endGame("won");
+      return;
     }
-    return amount;
+    milestoneTitleEl.textContent = `🎉 Prize #${milestone.prizeIndex + 1} unlocked!`;
+    milestoneTextEl.innerHTML = `You've locked in <strong>${PRIZES[milestone.prizeIndex]}</strong>.<br>Keep going for more!`;
+    milestoneOverlay.classList.remove("hidden");
   }
 
-  function endGame(won) {
-    let amount;
+  function endGame(result) {
     let title;
     let message;
-    if (won) {
-      amount = PRIZE_LADDER[PRIZE_LADDER.length - 1];
+    if (result === "won") {
       title = "🏆 You're a Moll-ionaire!";
-      message = "You answered all 15 questions correctly. Incredible.";
-    } else if (state.answered) {
-      amount = winningsForLoss();
+      message = "All 15 questions answered correctly. Legendary.";
+    } else if (result === "lost") {
       title = "Game over";
-      message = "That wasn't the right answer — but you keep your guaranteed winnings.";
+      message = state.prizesWon > 0
+        ? "Wrong answer — but you keep the prizes you've already locked in."
+        : "Wrong answer — and no prizes locked in yet. Tough break.";
     } else {
-      // Walked away
-      amount = state.questionIndex > 0 ? PRIZE_LADDER[state.questionIndex - 1] : 0;
       title = "You walked away";
-      message = "Smart move — taking the money and running.";
+      message = state.prizesWon > 0
+        ? "Smart move. You walk away with everything you've earned."
+        : "You walked away before earning any prizes. Maybe next time!";
     }
     endTitle.textContent = title;
     endMessage.textContent = message;
-    endAmount.textContent = formatMoney(amount);
+
+    endPrizesEl.innerHTML = "";
+    if (state.prizesWon === 0) {
+      const li = document.createElement("li");
+      li.classList.add("empty");
+      li.textContent = "No prizes earned this round.";
+      endPrizesEl.appendChild(li);
+    } else {
+      for (let i = 0; i < state.prizesWon; i++) {
+        const li = document.createElement("li");
+        li.textContent = `🎁 ${PRIZES[i]}`;
+        endPrizesEl.appendChild(li);
+      }
+    }
     showScreen(endScreen);
   }
 
-  // Lifelines
-  function useFiftyFifty() {
-    if (!state.lifelines.fifty || state.answered) return;
-    state.lifelines.fifty = false;
-    document.querySelector('[data-lifeline="fifty"]').disabled = true;
+  // ----- Lifelines -----
+
+  function disableLifeline(name) {
+    state.lifelines[name] = false;
+    document.querySelector(`[data-lifeline="${name}"]`).disabled = true;
+  }
+
+  function showLifelineMessage(html) {
+    lifelineMessageEl.innerHTML = html;
+    lifelineMessageEl.classList.remove("hidden");
+  }
+
+  function useJustino() {
+    if (!state.lifelines.justino || state.answered) return;
+    disableLifeline("justino");
 
     const q = QUESTIONS[state.questionIndex];
     const wrongIndices = [0, 1, 2, 3].filter((i) => i !== q.correct);
-    // Keep two wrong, hide two
     const shuffled = wrongIndices.sort(() => Math.random() - 0.5);
     const toHide = shuffled.slice(0, 2);
     toHide.forEach((i) => {
@@ -189,45 +272,42 @@
       answerButtons[i].disabled = true;
     });
     state.hiddenByFifty = toHide;
+
+    showLifelineMessage(`<strong>Justino:</strong> "Easy. It's down to two — pick one."`);
   }
 
-  function useAudience() {
-    if (!state.lifelines.audience || state.answered) return;
-    state.lifelines.audience = false;
-    document.querySelector('[data-lifeline="audience"]').disabled = true;
+  function useRios() {
+    if (!state.lifelines.rios || state.answered) return;
+    disableLifeline("rios");
 
     const q = QUESTIONS[state.questionIndex];
-    // Generate a poll weighted toward the correct answer, lower difficulty boost.
-    const difficulty = state.questionIndex / QUESTIONS.length; // 0..~1
-    const correctBase = 70 - difficulty * 35; // easier = more confident audience
-    const correctPct = Math.max(25, correctBase + (Math.random() * 15 - 7));
-    let remaining = 100 - correctPct;
+    const difficulty = state.questionIndex / QUESTIONS.length;
+    const correctBase = 65 - difficulty * 30;
+    const correctPct = Math.max(30, correctBase + (Math.random() * 14 - 7));
 
     const percentages = [0, 0, 0, 0];
     percentages[q.correct] = correctPct;
+    let remaining = 100 - correctPct;
     const others = [0, 1, 2, 3].filter((i) => i !== q.correct);
     others.forEach((i, idx) => {
       const isLast = idx === others.length - 1;
       let val;
-      if (isLast) val = remaining;
-      else {
+      if (state.hiddenByFifty.includes(i)) {
+        val = 0;
+      } else if (isLast) {
+        val = remaining;
+      } else {
         val = Math.random() * remaining * 0.7;
         remaining -= val;
       }
-      // Hidden 50:50 answers get 0
-      if (state.hiddenByFifty.includes(i)) {
-        if (!isLast) remaining += val;
-        val = 0;
-      }
       percentages[i] = val;
     });
-    // Renormalize if 50:50 zeroed out some
     const total = percentages.reduce((a, b) => a + b, 0);
     const scaled = percentages.map((p) => (p / total) * 100);
 
-    audiencePollEl.innerHTML = "";
-    audiencePollEl.classList.remove("hidden");
-    ["A", "B", "C", "D"].forEach((letter, i) => {
+    riosPollEl.innerHTML = "";
+    riosPollEl.classList.remove("hidden");
+    LETTERS.forEach((letter, i) => {
       const bar = document.createElement("div");
       bar.className = "poll-bar";
       const fill = document.createElement("div");
@@ -238,42 +318,75 @@
       label.textContent = `${letter}: ${Math.round(scaled[i])}%`;
       bar.appendChild(fill);
       bar.appendChild(label);
-      audiencePollEl.appendChild(bar);
-      requestAnimationFrame(() => {
-        fill.style.height = `${scaled[i]}%`;
-      });
+      riosPollEl.appendChild(bar);
+      requestAnimationFrame(() => { fill.style.height = `${scaled[i]}%`; });
     });
+
+    showLifelineMessage(`<strong>The Rios voted:</strong>`);
   }
 
-  function usePhone() {
-    if (!state.lifelines.phone || state.answered) return;
-    state.lifelines.phone = false;
-    document.querySelector('[data-lifeline="phone"]').disabled = true;
+  function useFamily() {
+    if (!state.lifelines.family || state.answered) return;
+    familyModal.classList.remove("hidden");
+  }
+
+  function deliverFamilyHint(name) {
+    disableLifeline("family");
 
     const q = QUESTIONS[state.questionIndex];
-    const letters = ["A", "B", "C", "D"];
-    // Confidence drops with difficulty
-    const confidence = Math.max(0.5, 0.95 - state.questionIndex * 0.04);
+    const confidence = Math.max(0.55, 0.92 - state.questionIndex * 0.035);
     const isConfident = Math.random() < confidence;
+    const correctLetter = LETTERS[q.correct];
+    const correctText = q.answers[q.correct];
 
-    let message;
+    let response;
     if (isConfident) {
-      message = `📞 "I'm pretty sure it's ${letters[q.correct]} — ${q.answers[q.correct]}. I'd go with that."`;
+      const phrasings = [
+        `"Oh, that one's easy — it's <strong>${correctLetter}, ${correctText}</strong>. Trust me."`,
+        `"Hah! ${correctText}. Definitely <strong>${correctLetter}</strong>."`,
+        `"I remember this — go with <strong>${correctLetter}</strong>. ${correctText}."`,
+        `"<strong>${correctLetter}</strong>. No question. ${correctText}."`,
+      ];
+      response = phrasings[Math.floor(Math.random() * phrasings.length)];
     } else {
-      const guesses = [q.correct];
       const others = [0, 1, 2, 3].filter((i) => i !== q.correct && !state.hiddenByFifty.includes(i));
-      if (others.length) guesses.push(others[Math.floor(Math.random() * others.length)]);
-      const sorted = guesses.sort();
-      message = `📞 "Hmm, tough one. It's either ${letters[sorted[0]]} or ${letters[sorted[1]]} — I'd lean toward ${letters[q.correct]} but I'm not certain."`;
+      const wrong = others.length ? others[Math.floor(Math.random() * others.length)] : (q.correct + 1) % 4;
+      const pair = [q.correct, wrong].sort();
+      response = `"Oof, tough one. I'd say it's between <strong>${LETTERS[pair[0]]}</strong> and <strong>${LETTERS[pair[1]]}</strong>... I'd lean <strong>${correctLetter}</strong>, but don't quote me."`;
     }
-    phoneMessageEl.textContent = message;
-    phoneMessageEl.classList.remove("hidden");
+
+    showLifelineMessage(`<strong>📞 ${name}:</strong> ${response}`);
+  }
+
+  function useRomulus() {
+    if (!state.lifelines.romulus || state.answered) return;
+    disableLifeline("romulus");
+
+    const q = QUESTIONS[state.questionIndex];
+    const correctLetter = LETTERS[q.correct];
+    // Romulus is reliable but cryptic
+    const isOnPoint = Math.random() < 0.85;
+    let response;
+    if (isOnPoint) {
+      const barks = [
+        `*tilts head, paws determinedly at letter <strong>${correctLetter}</strong>* WOOF!`,
+        `*sniffs each option, plants himself in front of <strong>${correctLetter}</strong>* 🐾`,
+        `*tail wags furiously when you hover over <strong>${correctLetter}</strong>*`,
+        `*one decisive bark while staring at <strong>${correctLetter}</strong>*`,
+      ];
+      response = barks[Math.floor(Math.random() * barks.length)];
+    } else {
+      const others = [0, 1, 2, 3].filter((i) => i !== q.correct && !state.hiddenByFifty.includes(i));
+      const wrong = others.length ? others[Math.floor(Math.random() * others.length)] : (q.correct + 1) % 4;
+      response = `*looks confused, sniffs at both <strong>${LETTERS[Math.min(q.correct, wrong)]}</strong> and <strong>${LETTERS[Math.max(q.correct, wrong)]}</strong>, then yawns*`;
+    }
+    showLifelineMessage(`<strong>🐶 Romulus:</strong> ${response}`);
   }
 
   // Wire up events
   startBtn.addEventListener("click", startGame);
   restartBtn.addEventListener("click", startGame);
-  walkAwayBtn.addEventListener("click", () => endGame(false));
+  walkAwayBtn.addEventListener("click", () => endGame("walked"));
   lockBtn.addEventListener("click", lockAnswer);
   unlockBtn.addEventListener("click", unlockAnswer);
 
@@ -281,7 +394,15 @@
     btn.addEventListener("click", () => selectAnswer(parseInt(btn.dataset.index, 10)));
   });
 
-  document.querySelector('[data-lifeline="fifty"]').addEventListener("click", useFiftyFifty);
-  document.querySelector('[data-lifeline="audience"]').addEventListener("click", useAudience);
-  document.querySelector('[data-lifeline="phone"]').addEventListener("click", usePhone);
+  document.querySelector('[data-lifeline="justino"]').addEventListener("click", useJustino);
+  document.querySelector('[data-lifeline="rios"]').addEventListener("click", useRios);
+  document.querySelector('[data-lifeline="family"]').addEventListener("click", useFamily);
+  document.querySelector('[data-lifeline="romulus"]').addEventListener("click", useRomulus);
+
+  familyCancelBtn.addEventListener("click", () => familyModal.classList.add("hidden"));
+
+  milestoneContinueBtn.addEventListener("click", () => {
+    milestoneOverlay.classList.add("hidden");
+    advance();
+  });
 })();
