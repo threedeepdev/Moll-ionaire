@@ -51,6 +51,11 @@ html, body {
                        drop-shadow(0 0 60px rgba(255, 210, 77, 0.25)); }
 }
 
+.wwtbam-logo--small {
+  width: clamp(60px, 12vw, 90px);
+  margin: 0 auto 10px;
+}
+
 .rules {
   list-style: none;
   padding: 0;

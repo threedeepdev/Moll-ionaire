@@ -139,7 +139,7 @@
     lockControls.classList.add("hidden");
     riosPollEl.classList.add("hidden");
     lifelineMessageEl.classList.add("hidden");
-    walkAwayBtn.style.display = state.questionIndex > 0 ? "inline-block" : "none";
+    walkAwayBtn.style.display = state.prizesWon > 0 ? "inline-block" : "none";
     updateLadder();
     updatePrizesUI();
   }

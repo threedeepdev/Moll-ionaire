@@ -11,120 +11,7 @@
     <!-- Start screen -->
     <section id="start-screen" class="screen active">
 
-      <!-- Millionaire-style circular logo -->
-      <svg class="wwtbam-logo" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-label="Who Wants to Be a Moll-ionaire?">
-        <defs>
-          <radialGradient id="cBg" cx="50%" cy="50%" r="50%">
-            <stop offset="0%"   stop-color="#3a1085"/>
-            <stop offset="65%"  stop-color="#190660"/>
-            <stop offset="100%" stop-color="#060225"/>
-          </radialGradient>
-          <linearGradient id="gld" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%"   stop-color="#fffac5"/>
-            <stop offset="30%"  stop-color="#ffd84d"/>
-            <stop offset="100%" stop-color="#9a5c06"/>
-          </linearGradient>
-          <clipPath id="mc"><circle cx="200" cy="200" r="161"/></clipPath>
-          <!-- Outer glow -->
-          <filter id="gl" x="-60%" y="-60%" width="220%" height="220%">
-            <feGaussianBlur stdDeviation="5" result="b"/>
-            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-          <!-- Text glow -->
-          <filter id="tg" x="-20%" y="-60%" width="140%" height="220%">
-            <feGaussianBlur stdDeviation="5" result="b"/>
-            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-          <!-- Top arc: clockwise over top of circle -->
-          <path id="ta" d="M 55,200 A 145,145 0 0,1 345,200"/>
-          <!-- Bottom arc: counter-clockwise under bottom -->
-          <path id="ba" d="M 55,200 A 145,145 0 0,0 345,200"/>
-        </defs>
-
-        <!-- Sparkle stars outside the circle -->
-        <g filter="url(#gl)">
-          <circle cx="28"  cy="85"  r="4"   fill="white" opacity="0.9"/>
-          <circle cx="372" cy="95"  r="5"   fill="white" opacity="0.9"/>
-          <circle cx="18"  cy="235" r="3"   fill="white" opacity="0.7"/>
-          <circle cx="382" cy="270" r="3.5" fill="white" opacity="0.8"/>
-          <circle cx="65"  cy="345" r="4"   fill="white" opacity="0.9"/>
-          <circle cx="335" cy="338" r="3"   fill="white" opacity="0.7"/>
-          <circle cx="115" cy="18"  r="5"   fill="white" opacity="0.9"/>
-          <circle cx="285" cy="12"  r="3"   fill="white" opacity="0.8"/>
-          <circle cx="200" cy="8"   r="3.5" fill="white" opacity="0.85"/>
-          <circle cx="48"  cy="155" r="2.5" fill="white" opacity="0.7"/>
-          <circle cx="352" cy="178" r="2.5" fill="white" opacity="0.7"/>
-          <!-- 4-point star sparkles -->
-          <polygon points="370,60 372,50 374,60 384,58 374,66 372,76 370,66 360,58" fill="white" opacity="0.85"/>
-          <polygon points="18,150 20,140 22,150 32,148 22,156 20,166 18,156 8,148"  fill="white" opacity="0.75"/>
-          <polygon points="60,328 62,318 64,328 74,326 64,334 62,344 60,334 50,326" fill="white" opacity="0.8"/>
-        </g>
-
-        <!-- Main circle fill -->
-        <circle cx="200" cy="200" r="180" fill="url(#cBg)"/>
-
-        <!-- Blue ribbon mandala (9 ellipses, 20° apart) -->
-        <g clip-path="url(#mc)" filter="url(#gl)">
-          <ellipse cx="200" cy="200" rx="93" ry="29" fill="none" stroke="#1a52be" stroke-width="11" transform="rotate(0   200 200)" opacity="0.88"/>
-          <ellipse cx="200" cy="200" rx="93" ry="29" fill="none" stroke="#1a52be" stroke-width="11" transform="rotate(20  200 200)" opacity="0.88"/>
-          <ellipse cx="200" cy="200" rx="93" ry="29" fill="none" stroke="#1a52be" stroke-width="11" transform="rotate(40  200 200)" opacity="0.88"/>
-          <ellipse cx="200" cy="200" rx="93" ry="29" fill="none" stroke="#1a52be" stroke-width="11" transform="rotate(60  200 200)" opacity="0.88"/>
-          <ellipse cx="200" cy="200" rx="93" ry="29" fill="none" stroke="#1a52be" stroke-width="11" transform="rotate(80  200 200)" opacity="0.88"/>
-          <ellipse cx="200" cy="200" rx="93" ry="29" fill="none" stroke="#1a52be" stroke-width="11" transform="rotate(100 200 200)" opacity="0.88"/>
-          <ellipse cx="200" cy="200" rx="93" ry="29" fill="none" stroke="#1a52be" stroke-width="11" transform="rotate(120 200 200)" opacity="0.88"/>
-          <ellipse cx="200" cy="200" rx="93" ry="29" fill="none" stroke="#1a52be" stroke-width="11" transform="rotate(140 200 200)" opacity="0.88"/>
-          <ellipse cx="200" cy="200" rx="93" ry="29" fill="none" stroke="#1a52be" stroke-width="11" transform="rotate(160 200 200)" opacity="0.88"/>
-        </g>
-
-        <!-- Gold ribbon mandala (9 ellipses offset 10°) -->
-        <g clip-path="url(#mc)" filter="url(#gl)">
-          <ellipse cx="200" cy="200" rx="93" ry="29" fill="none" stroke="#c07810" stroke-width="8" transform="rotate(10  200 200)" opacity="0.82"/>
-          <ellipse cx="200" cy="200" rx="93" ry="29" fill="none" stroke="#c07810" stroke-width="8" transform="rotate(30  200 200)" opacity="0.82"/>
-          <ellipse cx="200" cy="200" rx="93" ry="29" fill="none" stroke="#c07810" stroke-width="8" transform="rotate(50  200 200)" opacity="0.82"/>
-          <ellipse cx="200" cy="200" rx="93" ry="29" fill="none" stroke="#c07810" stroke-width="8" transform="rotate(70  200 200)" opacity="0.82"/>
-          <ellipse cx="200" cy="200" rx="93" ry="29" fill="none" stroke="#c07810" stroke-width="8" transform="rotate(90  200 200)" opacity="0.82"/>
-          <ellipse cx="200" cy="200" rx="93" ry="29" fill="none" stroke="#c07810" stroke-width="8" transform="rotate(110 200 200)" opacity="0.82"/>
-          <ellipse cx="200" cy="200" rx="93" ry="29" fill="none" stroke="#c07810" stroke-width="8" transform="rotate(130 200 200)" opacity="0.82"/>
-          <ellipse cx="200" cy="200" rx="93" ry="29" fill="none" stroke="#c07810" stroke-width="8" transform="rotate(150 200 200)" opacity="0.82"/>
-          <ellipse cx="200" cy="200" rx="93" ry="29" fill="none" stroke="#c07810" stroke-width="8" transform="rotate(170 200 200)" opacity="0.82"/>
-        </g>
-
-        <!-- Center cover (clears busy mandala center for text) -->
-        <circle cx="200" cy="200" r="48" fill="url(#cBg)"/>
-
-        <!-- Outer decorative rings -->
-        <circle cx="200" cy="200" r="178" fill="none" stroke="#6518a8" stroke-width="18"/>
-        <circle cx="200" cy="200" r="169" fill="none" stroke="#b565e8" stroke-width="2.5"/>
-        <circle cx="200" cy="200" r="162" fill="none" stroke="#4c1088" stroke-width="1.5"/>
-
-        <!-- Gold diamond ornaments at 45°/135°/225°/315° on the ring -->
-        <polygon points="326,319 333,326 326,333 319,326" fill="#ffd84d" filter="url(#gl)"/>
-        <polygon points="74,319 81,326 74,333 67,326"    fill="#ffd84d" filter="url(#gl)"/>
-        <polygon points="74,67 81,74 74,81 67,74"         fill="#ffd84d" filter="url(#gl)"/>
-        <polygon points="326,67 333,74 326,81 319,74"     fill="#ffd84d" filter="url(#gl)"/>
-
-        <!-- WHO WANTS TO BE A — curved over top -->
-        <text font-family="'Arial Black',Impact,sans-serif" font-size="19" font-weight="900"
-              fill="url(#gld)" filter="url(#gl)" letter-spacing="3.5">
-          <textPath href="#ta" startOffset="50%" text-anchor="middle">WHO WANTS TO BE A</textPath>
-        </text>
-
-        <!-- Dark band behind center text -->
-        <rect x="18" y="184" width="364" height="46" rx="4" fill="rgba(0,0,12,0.6)"/>
-
-        <!-- MOLL-IONAIRE! center text -->
-        <text x="200" y="217" text-anchor="middle"
-              font-family="'Arial Black','Franklin Gothic Medium',Impact,sans-serif"
-              font-size="38" font-weight="900" letter-spacing="1"
-              fill="white" stroke="#ffd84d" stroke-width="1.5"
-              filter="url(#tg)">MOLL-IONAIRE!</text>
-
-        <!-- WHO WANTS TO BE A — curved under bottom -->
-        <text font-family="'Arial Black',Impact,sans-serif" font-size="19" font-weight="900"
-              fill="url(#gld)" filter="url(#gl)" letter-spacing="3.5">
-          <textPath href="#ba" startOffset="50%" text-anchor="middle">WHO WANTS TO BE A</textPath>
-        </text>
-      </svg>
+      <img class="wwtbam-logo" src="logo.svg" alt="Who Wants to Be a Moll-ionaire?"/>
 
       <ul class="rules">
         <li>Answer all 5 → win <strong>Prize #1</strong></li>
@@ -136,6 +23,7 @@
 
     <!-- Game screen -->
     <section id="game-screen" class="screen">
+      <img class="wwtbam-logo wwtbam-logo--small" src="logo.svg" alt="Moll-ionaire"/>
       <div class="game-layout">
         <main class="game-main">
           <div class="lifelines" aria-label="Lifelines">
