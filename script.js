@@ -326,30 +326,7 @@
 
   function deliverFamilyHint(name) {
     disableLifeline("family");
-
-    const q = QUESTIONS[state.questionIndex];
-    const confidence = Math.max(0.55, 0.92 - state.questionIndex * 0.035);
-    const isConfident = Math.random() < confidence;
-    const correctLetter = LETTERS[q.correct];
-    const correctText = q.answers[q.correct];
-
-    let response;
-    if (isConfident) {
-      const phrasings = [
-        `"Oh, that one's easy — it's <strong>${correctLetter}, ${correctText}</strong>. Trust me."`,
-        `"Hah! ${correctText}. Definitely <strong>${correctLetter}</strong>."`,
-        `"I remember this — go with <strong>${correctLetter}</strong>. ${correctText}."`,
-        `"<strong>${correctLetter}</strong>. No question. ${correctText}."`,
-      ];
-      response = phrasings[Math.floor(Math.random() * phrasings.length)];
-    } else {
-      const others = [0, 1, 2, 3].filter((i) => i !== q.correct && !state.hiddenByFifty.includes(i));
-      const wrong = others.length ? others[Math.floor(Math.random() * others.length)] : (q.correct + 1) % 4;
-      const pair = [q.correct, wrong].sort();
-      response = `"Oof, tough one. I'd say it's between <strong>${LETTERS[pair[0]]}</strong> and <strong>${LETTERS[pair[1]]}</strong>... I'd lean <strong>${correctLetter}</strong>, but don't quote me."`;
-    }
-
-    showLifelineMessage(`<strong>📞 ${name}:</strong> ${response}`);
+    showLifelineMessage(`<strong>📞 Calling ${name}</strong> — lifeline used. Ask them in person!`);
   }
 
   function useRomulus() {
