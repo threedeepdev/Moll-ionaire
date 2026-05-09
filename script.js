@@ -201,14 +201,24 @@
   }
 
   function showMilestone(milestone) {
-    if (state.questionIndex === QUESTIONS.length - 1) {
-      // Last milestone — go straight to end screen
-      endGame("won");
-      return;
-    }
-    milestoneTitleEl.textContent = `🎉 Prize #${milestone.prizeIndex + 1} unlocked!`;
-    milestoneTextEl.innerHTML = `You've locked in <strong>${PRIZES[milestone.prizeIndex]}</strong>.<br>Keep going for more!`;
+    const isLast = state.questionIndex === QUESTIONS.length - 1;
+    const level = milestone.prizeIndex + 1; // 1, 2, or 3
+
+    const titles = [
+      "🎉 Prize #1 unlocked!",
+      "🎉🎉 Prize #2 unlocked!",
+      "🏆🦬 MOLL-IONAIRE!! 🦬🏆",
+    ];
+    milestoneTitleEl.textContent = titles[milestone.prizeIndex];
+    milestoneTextEl.innerHTML = isLast
+      ? `You answered all 15! You've won <strong>${PRIZES[milestone.prizeIndex]}</strong> — and everything else!`
+      : `You've locked in <strong>${PRIZES[milestone.prizeIndex]}</strong>.<br>Keep going for more!`;
+    milestoneContinueBtn.textContent = isLast ? "🦬 Claim your prizes! 🦬" : "Keep going →";
+
     milestoneOverlay.classList.remove("hidden");
+
+    const modalContent = milestoneOverlay.querySelector(".modal-content");
+    BuffaloShow.play(level, modalContent);
   }
 
   function endGame(result) {
@@ -403,6 +413,12 @@
 
   milestoneContinueBtn.addEventListener("click", () => {
     milestoneOverlay.classList.add("hidden");
-    advance();
+    const reels = milestoneOverlay.querySelector(".b-reels");
+    if (reels) reels.remove();
+    if (state.questionIndex === QUESTIONS.length - 1) {
+      endGame("won");
+    } else {
+      advance();
+    }
   });
 })();
