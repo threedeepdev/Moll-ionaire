@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Who Wants to Be a Moll-ionaire?</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Start screen -->
+    <section id="start-screen" class="screen active">
+      <div class="logo">
+        <h1>Who Wants to Be a</h1>
+        <h1 class="logo-accent">Moll-ionaire?</h1>
+      </div>
+      <p class="tagline">15 questions stand between you and the top prize.</p>
+      <button id="start-btn" class="btn-primary">Start Game</button>
+    </section>
+
+    <!-- Game screen -->
+    <section id="game-screen" class="screen">
+      <div class="game-layout">
+        <main class="game-main">
+          <div class="lifelines" aria-label="Lifelines">
+            <button class="lifeline" data-lifeline="fifty" title="50:50">50:50</button>
+            <button class="lifeline" data-lifeline="audience" title="Ask the Audience">👥</button>
+            <button class="lifeline" data-lifeline="phone" title="Phone a Friend">📞</button>
+          </div>
+
+          <div class="question-card">
+            <div id="question-number" class="question-number">Question 1</div>
+            <div id="question-text" class="question-text"></div>
+            <div id="answers" class="answers">
+              <button class="answer" data-index="0"><span class="letter">A</span><span class="answer-text"></span></button>
+              <button class="answer" data-index="1"><span class="letter">B</span><span class="answer-text"></span></button>
+              <button class="answer" data-index="2"><span class="letter">C</span><span class="answer-text"></span></button>
+              <button class="answer" data-index="3"><span class="letter">D</span><span class="answer-text"></span></button>
+            </div>
+            <div id="audience-poll" class="audience-poll hidden"></div>
+            <div id="phone-message" class="phone-message hidden"></div>
+            <div id="lock-controls" class="lock-controls hidden">
+              <button id="lock-btn" class="btn-primary">Lock it in</button>
+              <button id="unlock-btn" class="btn-secondary">Choose again</button>
+            </div>
+            <button id="walk-away-btn" class="btn-walkaway">Walk away</button>
+          </div>
+        </main>
+
+        <aside class="ladder" aria-label="Prize ladder">
+          <ol id="ladder-list"></ol>
+        </aside>
+      </div>
+    </section>
+
+    <!-- End screen -->
+    <section id="end-screen" class="screen">
+      <h2 id="end-title"></h2>
+      <p id="end-message"></p>
+      <p class="winnings">You walk away with <span id="end-amount"></span></p>
+      <button id="restart-btn" class="btn-primary">Play again</button>
+    </section>
+  </div>
+
+  <script src="questions.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
