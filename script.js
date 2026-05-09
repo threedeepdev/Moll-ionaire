@@ -246,6 +246,10 @@
 
     const modalContent = milestoneOverlay.querySelector(".modal-content");
     BuffaloShow.play(level, modalContent);
+
+    const snd = new Audio("buffalo.mp3");
+    snd.volume = 1.0;
+    snd.play().catch(() => {});
   }
 
   function endGame(result) {
